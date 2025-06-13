@@ -58,15 +58,13 @@ def upload():
 
        
         transcript, transcript_path = transcribe_audio(wav_path)
-        assert transcript is not None, "[ASSERT FAILED] transcript is None"
-        assert isinstance(transcript, str), "[ASSERT FAILED] transcript is not a string"
-        print(f"[ASSERT PASSED] transcript length: {len(transcript)}")
+
         transcript_path = os.path.normpath(transcript_path)
 
         print(f"[DEBUG] Received transcript of length {len(transcript) if transcript else 0}")
         print(f"[DEBUG] Transcript path: {transcript_path}")
 
-       # ✅ Step 3: Retry BEFORE checking transcript existence
+       
         import time
         for attempt in range(5):
             if os.path.isfile(transcript_path):
@@ -78,12 +76,12 @@ def upload():
             print("[ERROR] Transcript file not found after retries")
             return jsonify({"error": "Transcript file not found after retries."}), 500
 
-        # ✅ Step 4: Validate transcript content AFTER ensuring file exists
-        # if not transcript:
-        #     print("[ERROR] Transcript content is empty")
-        #     return jsonify({"error": "Empty transcript."}), 500
+       
+        if not transcript:
+            print("[ERROR] Transcript content is empty")
+            return jsonify({"error": "Empty transcript."}), 500
 
-        # Step 5: Save to DB
+       
         try:
             new_file = AUDIOFILE(
                 filename=filename,
